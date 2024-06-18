@@ -9,7 +9,7 @@ This software is free and belongs to the public domain. The author provides no w
 ## Dependency Installation
 
 - Required dependencies: [`fish`](https://github.com/fish-shell/fish-shell) (version >= `3.0.0`), [`curl`](https://github.com/curl/curl), [`jq`](https://github.com/stedolan/jq), [`pup`](https://github.com/ericchiang/pup), [`img2pdf`](https://github.com/josch/img2pdf).
-- Optional dependencies: [`parallel`](https://www.gnu.org/software/parallel/) (to enhance download speed), [`ocrmypdf`](https://github.com/ocrmypdf/OCRmyPDF) (for OCR on downloaded PDFs; limited support for Chinese).
+- Optional dependencies: [`parallel`](https://www.gnu.org/software/parallel/) (to enhance download speed), [`ocrmypdf`](https://github.com/ocrmypdf/OCRmyPDF) (for OCR on downloaded PDFs. Limited support for Chinese).
 
 ### Arch Linux
 
@@ -52,7 +52,7 @@ brew install fish curl jq pup parallel ocrmypdf
 1. Connect to Peking University's campus network or use the [Peking University VPN](https://its.pku.edu.cn/service_1_vpn.jsp).
 2. Go to the [Peking University Thesis Database](https://thesis.lib.pku.edu.cn/), and search for the thesis you want.
 3. Click on the title of the thesis in the search results, go to the "View Thesis Information" page, and click "View Full Text" at the top right corner.
-4. A page with a URL like "https://drm.lib.pku.edu.cn/pdfindex.jsp?fid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" will pop up, where you can view the thesis. Note down the `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` part after `fid=` in the URL.
+4. A page with a URL like "https://drm.lib.pku.edu.cn/pdfindex1.jsp?fid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" will pop up, where you can view the thesis. Note down the `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` part after `fid=` in the URL.
 5. In your browser, press `F12` (or `Ctrl` + `Shift` + `I` on Windows, `Option` + `Command` + `I` on MacOS) to open Developer Tools, select the _Storage_ tab, choose _Cookies_, and find the row with _Name_ as `JSESSIONID`. Note down the value `YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY` in the _Value_ column.
 6. Open a command line tool, navigate to the folder where `pku_copyleft.fish` is located, and run the following command to download the thesis PDF to that folder.
 
