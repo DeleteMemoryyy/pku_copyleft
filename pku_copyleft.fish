@@ -2,7 +2,7 @@
 
 # Load library
 begin
-	set --global --export pku_copyleft__websiteUrl 'http://162.105.134.201'
+	set --global --export pku_copyleft__websiteUrl 'https://drm.lib.pku.edu.cn'
 
 	function download
 		curl --location --compressed --user-agent 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2725.0 Safari/537.36' --referer "$pku_copyleft__websiteUrl/pdfindex.jsp?fid=$pku_copyleft__fid" --retry 5 --silent --show-error --cookie "JSESSIONID=$pku_copyleft__jsessionid" $argv
@@ -10,19 +10,27 @@ begin
 
 	function getTitleAndStartAndEndPageNumbers
 		set --local file_temp (mktemp)
-		download --output "$file_temp" -- "$pku_copyleft__websiteUrl/pdfindex.jsp?fid=$pku_copyleft__fid"
+        set --local indexUrl "$pku_copyleft__websiteUrl/pdfindex1.jsp?fid=$pku_copyleft__fid"
+        # echo "$indexUrl"
+		download --output "$file_temp" -- "$indexUrl"
 		#set --global title (cat -- "$file_temp" | pup 'body > input[id="infoname"] json{}' | jq --raw-output '.[0].value')
+        # cat "$file_temp"
 		cat -- "$file_temp" | pup 'body > input[id="infoname"] json{}' | jq --raw-output '.[0].value'
 		#set --global startPageNumber (cat -- "$file_temp" | pup 'body > input[id="startpage"] json{}' | jq --raw-output '.[0].value')
 		cat -- "$file_temp" | pup 'body > input[id="startpage"] json{}' | jq --raw-output '.[0].value'
 		#set --global endPageNumber (cat -- "$file_temp" | pup 'body > input[id="endpage"] json{}' | jq --raw-output '.[0].value')
 		cat -- "$file_temp" | pup 'body > input[id="endpage"] json{}' | jq --raw-output '.[0].value'
+
+		cat -- "$file_temp" | pup 'body > input[id="filename"] json{}' | jq --raw-output '.[0].value'
+
 		rm -- "$file_temp"
 	end
 
 	function downloadPage --argument-names pageNumber dir_output
 		set --local zeroBasedPageNumber (math -- "$pageNumber" - 1)
-		set --local pageUrl (download -- "$pku_copyleft__websiteUrl/jumpServlet?page=$zeroBasedPageNumber&fid=$pku_copyleft__fid" | jq --raw-output '.list[] | select(.id == "'"$zeroBasedPageNumber"'") | .src')
+		# set --local pageUrl (download -- "$pku_copyleft__websiteUrl/jumpServlet?page=$zeroBasedPageNumber&fid=$pku_copyleft__fid" | jq --raw-output '.list[] | select(.id == "'"$zeroBasedPageNumber"'") | .src')
+		set --local pageUrl (download -- "$pku_copyleft__websiteUrl/jumpServlet?page=$zeroBasedPageNumber&fid=$pku_copyleft__fid&userid=&filename=$remoteFineName&visitid=" | jq --raw-output '.list[] | select(.id == "'"$zeroBasedPageNumber"'") | .src')
+
 		download --output "$dir_output"/"$pageNumber"'.jpg' -- "$pageUrl"
 	end
 
@@ -58,7 +66,7 @@ function help
 	echo
 	echo 'Options:'
 	echo '        -c, --cookie=<JSESSIONID>     Cookie "JSESSIONID" (look up in the browser)'
-	echo '        -f, --fid=<fid>               "fid" of the thesis (see URL of the thesis, e.g. "http://162.105.134.201/pdfindex.jsp?fid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")'
+	echo '        -f, --fid=<fid>               "fid" of the thesis (see URL of the thesis, e.g. "https://drm.lib.pku.edu.cn/pdfindex.jsp?fid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")'
 	echo '        -o, --output-dir=<directory>  Specify output directory (default: $PWD)'
 	echo '        -l, --language=<languages>    Language(s) of the file to be OCRed (see `tesseract --list-langs` for all language packs installed in your system). Use `-l eng+deu` for multiple languages'
 	echo '        -h, --help                    Display this help message'
@@ -107,6 +115,7 @@ begin
 	set --local titleAndStartAndEndPageNumbers (getTitleAndStartAndEndPageNumbers)
 	set --global title "$titleAndStartAndEndPageNumbers[1]"
 	set --global startAndEndPageNumbers $titleAndStartAndEndPageNumbers[2 3]
+    set -- global remoteFileName "$titleAndStartAndEndPageNumbers[4]"
 	if test "$startAndEndPageNumbers[2]" = 'null' || test "$startAndEndPageNumbers[3]" = 'null'
 		echo 'Error: Please check cookie "JSESSIONID" and "fid" of the thesis' >&2
 		exit 1

@@ -1,13 +1,15 @@
 # PKU Copyleft
 
-从北京大学版权保护系统下载论文的小工具。
+A tool for downloading theses from Peking University's copyright protection system.
 
-本软件是自由软件，代码属于公有领域，作者不提供任何担保或保障。使用者需要为使用本软件承担可能的一切责任；因为使用本软件而产生的任何后果，由使用者承担。
+Modified from the original [`PKU Copyleft`](https://github.com/mingcenwei/pku_copyleft) repository.
 
-## 依赖安装
+This software is free and belongs to the public domain. The author provides no warranties or guarantees. Users must assume all responsibilities for using this software; any consequences resulting from its use are borne by the users.
 
-- 必须安装的依赖：[`fish`](https://github.com/fish-shell/fish-shell) (version >= `3.0.0`)、[`curl`](https://github.com/curl/curl)、[`jq`](https://github.com/stedolan/jq)、[`pup`](https://github.com/ericchiang/pup)、[`img2pdf`](https://github.com/josch/img2pdf)。
-- 可选依赖：[`parallel`](https://www.gnu.org/software/parallel/)（用于提升下载速度）、[`ocrmypdf`](https://github.com/ocrmypdf/OCRmyPDF)（用于对下载的PDF文档进行图片文字识别；对中文支持较差）。
+## Dependency Installation
+
+- Required dependencies: [`fish`](https://github.com/fish-shell/fish-shell) (version >= `3.0.0`), [`curl`](https://github.com/curl/curl), [`jq`](https://github.com/stedolan/jq), [`pup`](https://github.com/ericchiang/pup), [`img2pdf`](https://github.com/josch/img2pdf).
+- Optional dependencies: [`parallel`](https://www.gnu.org/software/parallel/) (to enhance download speed), [`ocrmypdf`](https://github.com/ocrmypdf/OCRmyPDF) (for OCR on downloaded PDFs; limited support for Chinese).
 
 ### Arch Linux
 
@@ -15,7 +17,7 @@
 sudo pacman --sync --refresh --sysupgrade && sudo pacman --sync fish curl jq img2pdf parallel
 ```
 
-[`pup`](https://aur.archlinux.org/packages/pup)（或 [`pup-git`](https://aur.archlinux.org/packages/pup-git)、[`pup-bin`](https://aur.archlinux.org/packages/pup-bin)）、[`ocrmypdf`](https://aur.archlinux.org/packages/ocrmypdf) 需要从 [AUR](https://aur.archlinux.org/) 安装。
+[`pup`](https://aur.archlinux.org/packages/pup) (or [`pup-git`](https://aur.archlinux.org/packages/pup-git), [`pup-bin`](https://aur.archlinux.org/packages/pup-bin)), [`ocrmypdf`](https://aur.archlinux.org/packages/ocrmypdf) need to be installed from [AUR](https://aur.archlinux.org/).
 
 ### Ubuntu
 
@@ -24,7 +26,8 @@ sudo apt-add-repository ppa:fish-shell/release-3
 sudo apt update && sudo apt install fish curl jq img2pdf parallel ocrmypdf
 ```
 
-[`pup`](https://github.com/ericchiang/pup) 需要手动安装。
+[`pup`](https://github.com/ericchiang/pup) needs to be installed manually.
+
 
 ### Termux
 
@@ -32,31 +35,31 @@ sudo apt update && sudo apt install fish curl jq img2pdf parallel ocrmypdf
 apt update && apt install fish curl jq pup parallel
 ```
 
-[`img2pdf`](https://github.com/josch/img2pdf)、[`ocrmypdf`](https://github.com/ocrmypdf/OCRmyPDF) 需要手动安装。
+[`img2pdf`](https://github.com/josch/img2pdf) and [`ocrmypdf`](https://github.com/ocrmypdf/OCRmyPDF) needs to be installed manually.
 
 ### macOS
 
-使用 [Homebrew](https://brew.sh/) 安装：
+Install with [Homebrew](https://brew.sh/)：
 
 ```shell
 brew install fish curl jq pup parallel ocrmypdf
 ```
 
-[`img2pdf`](https://github.com/josch/img2pdf) 需要手动安装。
+[`img2pdf`](https://github.com/josch/img2pdf) needs to be installed manually.
 
-## 使用方法
+## Usage
 
-1. 连接北京大学校园网，或者使用[北京大学 VPN](https://its.pku.edu.cn/service_1_vpn.jsp)。
-2. 进入[北京大学学位论文数据库](https://thesis.lib.pku.edu.cn/)，搜索你想要的论文。
-3. 点击搜索出来的学位论文题名，进入“查看论文信息”页面，点击右上角的“查看全文”。
-4. 将会弹出网址形如 "http://162.105.134.201/pdfindex.jsp?fid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 的页面，在该页面可以查看论文。记录下此页面网址中 `fid=` 后面的 `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`。
-5. 在浏览器中按 `F12` 打开开发者工具，选择 _Storage_ 标签页，选择 _Cookies_，然后找到 _Name_ 列为 `JSESSIONID` 的一行，记录下该行的 _Value_ 列的值 `YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY`。
-6. 打开命令行工具，进入 `pku_copyleft.fish` 所在文件夹，然后输入以下命令即可将论文的 PDF 下载到该文件夹。
+1. Connect to Peking University's campus network or use the [Peking University VPN](https://its.pku.edu.cn/service_1_vpn.jsp).
+2. Go to the [Peking University Thesis Database](https://thesis.lib.pku.edu.cn/), and search for the thesis you want.
+3. Click on the title of the thesis in the search results, go to the "View Thesis Information" page, and click "View Full Text" at the top right corner.
+4. A page with a URL like "https://drm.lib.pku.edu.cn/pdfindex.jsp?fid=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" will pop up, where you can view the thesis. Note down the `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` part after `fid=` in the URL.
+5. In your browser, press `F12` (or `Ctrl` + `Shift` + `I` on Windows, `Option` + `Command` + `I` on MacOS) to open Developer Tools, select the _Storage_ tab, choose _Cookies_, and find the row with _Name_ as `JSESSIONID`. Note down the value `YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY` in the _Value_ column.
+6. Open a command line tool, navigate to the folder where `pku_copyleft.fish` is located, and run the following command to download the thesis PDF to that folder.
 
 ```shell
-./pku_copyleft.fish --cookie 'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY' --fid 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+./pku_copyleft.fish -c 'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY' -f 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ```
 
-## 自由软件
+## Free Software
 
-本软件是自由软件，代码属于公有领域。请参见 [`Unlicense.txt`](./Unlicense.txt)。
+This software is free and belongs to the public domain. See [`Unlicense.txt`](./Unlicense.txt) for details.
